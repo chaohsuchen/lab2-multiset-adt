@@ -29,7 +29,7 @@ public class BST {
 
 
     public boolean isEmpty() {
-        return false; // TODO implement me!
+        return root == null;
     }
 
     public boolean contains(int item) {
@@ -47,33 +47,89 @@ public class BST {
 
 
     public void insert(int item) {
-
+        if (this.isEmpty()) {
+            root = item;
+            left = new BST();
+            right = new BST();
+        } else if (item <= root) {
+            left.insert(item);
+        } else {
+            right.insert(item);
+        }
     }
 
 
     public void delete(int item) {
+        if (this.isEmpty()) {
+            return;
+        }
 
+        if (item == root) {
+            deleteRoot();
+        } else if (item < root) {
+            left.delete(item);
+        } else {
+            right.delete(item);
+        }
     }
 
     private void deleteRoot() {
-
+        if (left.isEmpty() && right.isEmpty()) {
+            root = null;
+            left = null;
+            right = null;
+        } else if (left.isEmpty()) {
+            promote(right);
+        } else if (right.isEmpty()) {
+            promote(left);
+        } else {
+            // Replacing the root with the maximum from the left subtree
+            // preserves the binary-search-tree ordering.
+            root = left.extractMax();
+        }
     }
 
+    /** Replace this node with the contents of a non-empty child subtree. */
+    private void promote(BST subtree) {
+        root = subtree.root;
+        left = subtree.left;
+        right = subtree.right;
+    }
 
     private int extractMax() {
-        return -1;
+        if (right.isEmpty()) {
+            int maximum = root;
+            promote(left);
+            return maximum;
+        }
+        return right.extractMax();
     }
 
     public int height() {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        }
+        return Math.max(left.height(), right.height()) + 1;
     }
 
     public int count(int item) {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        } else if (root > item) {
+            return left.count(item);
+        } else if (root == item) {
+            // Although insert puts duplicates on the left, counting both
+            // subtrees keeps this correct for every valid BST arrangement.
+            return 1 + left.count(item) + right.count(item);
+        }
+        return right.count(item);
     }
 
     public int getSize() {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        }
+        return 1 + left.getSize() + right.getSize();
     }
 
     public static void main(String[] args) {
